@@ -1,0 +1,40 @@
+header:
+	magic "OCGPU"
+	uint8_t bpp; // 4 or 8
+	uint8_t w, h; // measured in chars
+	uint8_t palsize; // 0 <= palsize <= 16, number of palette entries
+	palette;
+	messages;
+
+palette:
+	for(i = 0; i < palsize; i++) {
+		uint8_t r, g, b;
+	}
+
+messages:
+	bit mask: 00000sfb
+	0x00 is reserved
+
+	b set: 0x00 indicates background
+	f set: 0x00 indicates foreground
+	no B:F merge for 4bpp here as it would complicate things w/o any real gain
+
+	s set: read these bytes:
+		uint8_t x, y; // 1-based
+		uint8_t run_count;
+		for(i = 0; i < run_count; i++) {
+			uint8_t len;
+			uint8_t braille_bytes[len];
+			if(not last run) {
+				int8_t skip_len;
+			}
+		}
+
+	these will be arranged in braille format (U+28xx format),
+	NOT in CTIF format!
+
+	skip_len indicates how many spaces to add.
+	if positive, fill with bg colour (U+2800 / space).
+	if negative, fill with fg colour (U+28FF / solid).
+	-128 (0x80) and 0 (0x00) are reserved.
+
